@@ -4,14 +4,18 @@ library(tidyverse)
 library(reshape2)
 
 
+# function for scaling data
+scale_01 <- function(x){(x-min(x))/(max(x)-min(x))}
+
+
 # melt and calculate density 
 calc_density_melt <- function(df, variable = "variable", value = "value"){
-  df %>% melt() %>% group_by(!! sym(variable))  %>% mutate(dens = approxfun(density(!! sym(value)))(!! sym(value))) %>% ungroup() %>% print()
+  df %>% melt() %>% group_by(!! sym(variable))  %>% mutate(dens = approxfun(density(!! sym(value)))(!! sym(value)) %>% scale_01())  %>% ungroup() %>% print()
 }
 
 # calculate density on previously melt() object
 calc_density <- function(df, variable = "variable", value = "value"){
-  df %>% group_by(!! sym(variable))  %>% mutate(dens = approxfun(density(!! sym(value)))(!! sym(value))) %>% ungroup() %>% print()
+  df %>% group_by(!! sym(variable))  %>% mutate(dens = approxfun(density(!! sym(value)))(!! sym(value)) %>% scale_01()) %>% ungroup() %>% print()
 }
 
 
@@ -32,5 +36,3 @@ heat_scatter <- function(df, variable = "variable", value = "value", dens = "den
 df <- tibble("1" = runif(100), "2" = runif(100), "3" = runif(100))
 
 heat_scatter(calc_density_melt(df))
-
-
